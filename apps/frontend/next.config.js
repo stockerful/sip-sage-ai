@@ -1,13 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
-    // This is only needed because Vercel is being overly strict with SpeechRecognition types.
+    // Allow production builds to succeed even if there are type errors
+    // (SpeechRecognition types are browser-only and tricky in Vercel)
     ignoreBuildErrors: true,
   },
   eslint: {
+    // Skip ESLint during build as well
     ignoreDuringBuilds: true,
   },
 };
