@@ -2,13 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-declare global {
-  interface Window {
-    SpeechRecognition: new () => SpeechRecognition;
-    webkitSpeechRecognition: new () => SpeechRecognition;
-  }
-}
-
 export default function Recommendations() {
   const [preferences, setPreferences] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,33 +9,36 @@ export default function Recommendations() {
   const [history, setHistory] = useState<any[]>([]);
   const [isListening, setIsListening] = useState(false);
 
-  const [recognition, setRecognition] = useState<any>(null);
+  const [recognitionInstance, setRecognitionInstance] = useState<any>(null);
 
+  // Initialize SpeechRecognition safely
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      
       if (SpeechRecognitionAPI) {
         const recog = new SpeechRecognitionAPI();
         recog.continuous = false;
         recog.interimResults = false;
         recog.lang = 'en-US';
-        setRecognition(recog);
+        
+        setRecognitionInstance(recog);
       }
     }
   }, []);
 
   const toggleVoiceInput = () => {
-    if (!recognition) {
+    if (!recognitionInstance) {
       alert("Voice input is not supported in this browser. Please use Chrome or Edge.");
       return;
     }
 
     if (isListening) {
-      recognition.stop();
+      recognitionInstance.stop();
       setIsListening(false);
     } else {
       try {
-        recognition.start();
+        recognitionInstance.start();
         setIsListening(true);
       } catch (e) {
         alert("Could not start voice recognition.");
@@ -50,21 +46,24 @@ export default function Recommendations() {
     }
   };
 
-  if (recognition) {
-    recognition.onresult = (event: any) => {
+  // Set up event listeners
+  useEffect(() => {
+    if (!recognitionInstance) return;
+
+    recognitionInstance.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.trim();
       setPreferences(transcript);
       setIsListening(false);
 
       setTimeout(() => {
-        const fakeEvent = { preventDefault: () => {} } as any;
+        const fakeEvent = { preventDefault: () => {} };
         handleSubmit(fakeEvent);
       }, 600);
     };
 
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
-  }
+    recognitionInstance.onerror = () => setIsListening(false);
+    recognitionInstance.onend = () => setIsListening(false);
+  }, [recognitionInstance]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -161,7 +160,7 @@ export default function Recommendations() {
           </form>
         </div>
 
-        {/* Results Section - Same as before */}
+        {/* Results */}
         {result && (
           <div className="space-y-16">
             <div className="bg-white border border-[#D4C9B8] rounded-3xl p-12 text-center">
