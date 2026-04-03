@@ -7,55 +7,8 @@ export default function Recommendations() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
-  const [isListening, setIsListening] = useState(false);
 
-  let recognition: any = null;
-
-  // Safe SpeechRecognition setup
-  if (typeof window !== 'undefined') {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SR) {
-      recognition = new SR();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-    }
-  }
-
-  const toggleVoiceInput = () => {
-    if (!recognition) {
-      alert("Voice input is not supported in this browser. Please use Chrome or Edge.");
-      return;
-    }
-
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-    } else {
-      try {
-        recognition.start();
-        setIsListening(true);
-      } catch (e) {
-        alert("Could not start voice recognition.");
-      }
-    }
-  };
-
-  // Attach listeners
-  if (recognition) {
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript.trim();
-      setPreferences(transcript);
-      setIsListening(false);
-
-      setTimeout(() => handleSubmit({ preventDefault: () => {} }), 400);
-    };
-
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
-  }
-
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!preferences.trim()) return;
 
@@ -107,26 +60,17 @@ export default function Recommendations() {
           </p>
         </div>
 
-        {/* Input Area */}
+        {/* Input Area - No Voice Input */}
         <div className="bg-white rounded-3xl shadow-xl p-12 mb-16 border border-[#D4C9B8]">
           <form onSubmit={handleSubmit}>
-            <div className="flex justify-between items-center mb-4">
-              <label className="text-base uppercase tracking-widest text-[#6F7F5F] font-medium">
-                Guest's Taste Profile
-              </label>
-              <button
-                type="button"
-                onClick={toggleVoiceInput}
-                className={`p-4 rounded-full transition-all ${isListening ? 'bg-[#4A0F1F] text-white scale-110' : 'bg-[#D4C9B8] hover:bg-[#C17A5A] text-[#2C2C2C]'}`}
-              >
-                🎤
-              </button>
-            </div>
+            <label className="text-base uppercase tracking-widest text-[#6F7F5F] font-medium block mb-4">
+              Guest's Taste Profile
+            </label>
 
             <textarea
               value={preferences}
               onChange={(e) => setPreferences(e.target.value)}
-              placeholder="Describe the guest's taste... or click the microphone to speak"
+              placeholder="Describe the guest's taste (e.g. bright fruit-forward Pinot Noir with good acidity)"
               className="w-full h-52 p-8 text-2xl border border-[#D4C9B8] rounded-3xl focus:outline-none focus:border-[#4A0F1F] resize-y bg-white text-black placeholder:text-gray-400 leading-relaxed"
               disabled={loading}
             />
