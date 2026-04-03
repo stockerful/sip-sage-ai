@@ -2,16 +2,65 @@
 
 import { useState } from 'react';
 
-// THIS IS A NEW VERSION - VOICE INPUT REMOVED TO FIX VERCEL BUILD
-// If you see this comment in the deployed site, the new file worked
-
 export default function Recommendations() {
   const [preferences, setPreferences] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
+  const [isListening, setIsListening] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  let recognition: any = null;
+
+  if (typeof window !== 'undefined') {
+    // Type cast to fix Vercel TypeScript error
+    const SpeechRecognitionAPI = 
+      (window as any).SpeechRecognition || 
+      (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognitionAPI) {
+      recognition = new SpeechRecognitionAPI();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+    }
+  }
+
+  const toggleVoiceInput = () => {
+    if (!recognition) {
+      alert("Voice input is not supported in this browser. Please use Chrome or Edge.");
+      return;
+    }
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognition.start();
+        setIsListening(true);
+      } catch (e) {
+        alert("Could not start voice recognition.");
+      }
+    }
+  };
+
+  if (recognition) {
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.trim();
+      setPreferences(transcript);
+      setIsListening(false);
+
+      setTimeout(() => {
+        const fakeEvent = { preventDefault: () => {} };
+        handleSubmit(fakeEvent);
+      }, 600);
+    };
+
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+  }
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!preferences.trim()) return;
 
@@ -64,14 +113,23 @@ export default function Recommendations() {
 
         <div className="bg-white rounded-3xl shadow-xl p-12 mb-16 border border-[#D4C9B8]">
           <form onSubmit={handleSubmit}>
-            <label className="text-base uppercase tracking-widest text-[#6F7F5F] font-medium block mb-4">
-              Guest's Taste Profile
-            </label>
+            <div className="flex justify-between items-center mb-4">
+              <label className="text-base uppercase tracking-widest text-[#6F7F5F] font-medium">
+                Guest's Taste Profile
+              </label>
+              <button
+                type="button"
+                onClick={toggleVoiceInput}
+                className={`p-4 rounded-full transition-all ${isListening ? 'bg-[#4A0F1F] text-white scale-110' : 'bg-[#D4C9B8] hover:bg-[#C17A5A] text-[#2C2C2C]'}`}
+              >
+                🎤
+              </button>
+            </div>
 
             <textarea
               value={preferences}
               onChange={(e) => setPreferences(e.target.value)}
-              placeholder="Describe the guest's taste (e.g. bright fruit-forward Pinot Noir with good acidity)"
+              placeholder="Describe the guest's taste... or click the microphone to speak"
               className="w-full h-52 p-8 text-2xl border border-[#D4C9B8] rounded-3xl focus:outline-none focus:border-[#4A0F1F] resize-y bg-white text-black placeholder:text-gray-400 leading-relaxed"
               disabled={loading}
             />
@@ -111,6 +169,7 @@ export default function Recommendations() {
                     className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700"
                   >
                     <div className="h-2.5 bg-gradient-to-r from-[#4A0F1F] via-[#A65E3C] to-[#C17A5A]"></div>
+                    
                     <div className="p-16">
                       <div className="mb-14">
                         <h3 className="text-6xl font-serif text-[#2C2C2C] tracking-[-1.5px] font-semibold leading-none">
