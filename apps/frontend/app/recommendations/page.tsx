@@ -1,22 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
 
 export default function Recommendations() {
   const [preferences, setPreferences] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [result, setResult] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
   const [isListening, setIsListening] = useState(false);
 
-  let recognition = null;
-  if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognitionAPI();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-  }
+  const [recognition, setRecognition] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognitionAPI) {
+        const recog = new SpeechRecognitionAPI();
+        recog.continuous = false;
+        recog.interimResults = false;
+        recog.lang = 'en-US';
+        setRecognition(recog);
+      }
+    }
+  }, []);
 
   const toggleVoiceInput = () => {
     if (!recognition) {
@@ -38,13 +51,13 @@ export default function Recommendations() {
   };
 
   if (recognition) {
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.trim();
       setPreferences(transcript);
       setIsListening(false);
 
       setTimeout(() => {
-        const fakeEvent = { preventDefault: () => {} };
+        const fakeEvent = { preventDefault: () => {} } as any;
         handleSubmit(fakeEvent);
       }, 600);
     };
@@ -53,7 +66,7 @@ export default function Recommendations() {
     recognition.onend = () => setIsListening(false);
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!preferences.trim()) return;
 
@@ -148,7 +161,7 @@ export default function Recommendations() {
           </form>
         </div>
 
-        {/* Results */}
+        {/* Results Section - Same as before */}
         {result && (
           <div className="space-y-16">
             <div className="bg-white border border-[#D4C9B8] rounded-3xl p-12 text-center">
@@ -159,7 +172,7 @@ export default function Recommendations() {
 
             {result.recommendations && result.recommendations.length > 0 && (
               <div className="space-y-16">
-                {result.recommendations.map((wine, index) => (
+                {result.recommendations.map((wine: any, index: number) => (
                   <div 
                     key={index} 
                     className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700"
@@ -206,16 +219,6 @@ export default function Recommendations() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {(!result.recommendations || result.recommendations.length === 0) && result.raw_ai_response && (
-              <div className="bg-white rounded-3xl p-16 border border-[#D4C9B8] shadow-sm">
-                <div className="max-w-2xl mx-auto">
-                  <div className="text-[19px] leading-[1.85] text-gray-800 font-light tracking-wide whitespace-pre-wrap">
-                    {result.raw_ai_response.replace(/\*/g, '')}
-                  </div>
-                </div>
               </div>
             )}
           </div>
