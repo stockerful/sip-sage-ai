@@ -11,10 +11,11 @@ export default function Recommendations() {
 
   let recognition: any = null;
 
+  // Safe SpeechRecognition setup
   if (typeof window !== 'undefined') {
-    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognitionAPI) {
-      recognition = new SpeechRecognitionAPI();
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SR) {
+      recognition = new SR();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
@@ -35,23 +36,19 @@ export default function Recommendations() {
         recognition.start();
         setIsListening(true);
       } catch (e) {
-        alert("Could not start voice recognition. Please try again.");
+        alert("Could not start voice recognition.");
       }
     }
   };
 
-  // Setup listeners once
+  // Attach listeners
   if (recognition) {
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.trim();
       setPreferences(transcript);
       setIsListening(false);
 
-      // Auto submit
-      setTimeout(() => {
-        const fakeEvent = { preventDefault: () => {} };
-        handleSubmit(fakeEvent);
-      }, 300);
+      setTimeout(() => handleSubmit({ preventDefault: () => {} }), 400);
     };
 
     recognition.onerror = () => setIsListening(false);
