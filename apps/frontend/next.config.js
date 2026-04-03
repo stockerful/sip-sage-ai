@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // This is the key fix for Vercel
+    // Completely ignore TypeScript errors during build
     ignoreBuildErrors: true,
   },
   eslint: {
+    // Also ignore ESLint
     ignoreDuringBuilds: true,
   },
 };
