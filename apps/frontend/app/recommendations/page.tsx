@@ -46,7 +46,6 @@ export default function Recommendations() {
   return (
     <div className="min-h-screen bg-[#F8F4EB] text-gray-900 font-sans">
       <div className="max-w-3xl mx-auto px-6 py-12">
-        {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-3 mb-4">
             <div className="w-3 h-3 bg-gradient-to-r from-[#4A0F1F] to-[#A65E3C] rounded-full"></div>
@@ -60,7 +59,6 @@ export default function Recommendations() {
           </p>
         </div>
 
-        {/* Input Area - No Voice Input */}
         <div className="bg-white rounded-3xl shadow-xl p-12 mb-16 border border-[#D4C9B8]">
           <form onSubmit={handleSubmit}>
             <label className="text-base uppercase tracking-widest text-[#6F7F5F] font-medium block mb-4">
@@ -94,7 +92,6 @@ export default function Recommendations() {
           </form>
         </div>
 
-        {/* Results */}
         {result && (
           <div className="space-y-16">
             <div className="bg-white border border-[#D4C9B8] rounded-3xl p-12 text-center">
@@ -106,12 +103,8 @@ export default function Recommendations() {
             {result.recommendations && result.recommendations.length > 0 && (
               <div className="space-y-16">
                 {result.recommendations.map((wine: any, index: number) => (
-                  <div 
-                    key={index} 
-                    className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700"
-                  >
+                  <div key={index} className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700">
                     <div className="h-2.5 bg-gradient-to-r from-[#4A0F1F] via-[#A65E3C] to-[#C17A5A]"></div>
-                    
                     <div className="p-16">
                       <div className="mb-14">
                         <h3 className="text-6xl font-serif text-[#2C2C2C] tracking-[-1.5px] font-semibold leading-none">
@@ -157,7 +150,6 @@ export default function Recommendations() {
           </div>
         )}
 
-        {/* History */}
         {history.length > 0 && (
           <div className="mt-24 pt-16 border-t border-gray-200">
             <p className="uppercase text-sm tracking-[3px] text-[#6F7F5F] mb-8 font-medium">Recent Guest Conversations</p>
