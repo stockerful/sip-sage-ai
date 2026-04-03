@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function SIPSageAI() {
+export default function Recommendations() {
   const [preferences, setPreferences] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -103,12 +103,8 @@ export default function SIPSageAI() {
             {result.recommendations && result.recommendations.length > 0 && (
               <div className="space-y-16">
                 {result.recommendations.map((wine: any, index: number) => (
-                  <div 
-                    key={index} 
-                    className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700"
-                  >
+                  <div key={index} className="bg-white rounded-3xl overflow-hidden border border-[#D4C9B8] shadow-sm hover:shadow-2xl transition-all duration-700">
                     <div className="h-2.5 bg-gradient-to-r from-[#4A0F1F] via-[#A65E3C] to-[#C17A5A]"></div>
-                    
                     <div className="p-16">
                       <div className="mb-14">
                         <h3 className="text-6xl font-serif text-[#2C2C2C] tracking-[-1.5px] font-semibold leading-none">
