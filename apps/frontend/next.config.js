@@ -1,16 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
+    // Ignore TypeScript errors during build (needed for SpeechRecognition API)
     ignoreBuildErrors: true,
   },
   eslint: {
+    // Also ignore ESLint during build
     ignoreDuringBuilds: true,
-  },
-  // Force skip Turborepo interference
-  experimental: {
-    turbotrace: {
-      logLevel: 'error',
-    },
   },
 };
 
