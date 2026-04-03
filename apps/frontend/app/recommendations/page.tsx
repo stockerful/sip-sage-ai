@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-// FORCE VERCEL TO RECOGNIZE NEW FILE - Voice input removed to fix build
+// THIS IS A NEW VERSION - VOICE INPUT REMOVED TO FIX VERCEL BUILD
+// If you see this comment in the deployed site, the new file worked
+
 export default function Recommendations() {
   const [preferences, setPreferences] = useState('');
   const [loading, setLoading] = useState(false);
