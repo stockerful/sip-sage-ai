@@ -1,16 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/frontend/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/apps/frontend/$1"
-    }
-  ],
+  "buildCommand": "cd apps/frontend && pnpm run build",
+  "installCommand": "cd apps/frontend && pnpm install",
+  "framework": "nextjs",
+  "rootDirectory": "apps/frontend",
+  "outputDirectory": "apps/frontend/.next",
+  "env": {
+    "NODE_ENV": "production"
+  },
   "ignoreCommand": "exit 0"
 }
