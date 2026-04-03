@@ -11,8 +11,8 @@ export default function Recommendations() {
 
   let recognition: any = null;
 
+  // Safe initialization with type cast
   if (typeof window !== 'undefined') {
-    // Type cast to fix Vercel TypeScript error
     const SpeechRecognitionAPI = 
       (window as any).SpeechRecognition || 
       (window as any).webkitSpeechRecognition;
@@ -44,6 +44,7 @@ export default function Recommendations() {
     }
   };
 
+  // Set up listeners
   if (recognition) {
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.trim();
